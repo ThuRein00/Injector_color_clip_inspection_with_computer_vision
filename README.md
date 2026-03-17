@@ -49,7 +49,7 @@ Converts the frame to HSV, applies a color threshold for the orangenclip, finds 
 ![alt text](images/pipeline.png)
 
 ### Width Check
-Fits a minimum area rectangle around the clip contour. The longer side = clip width. Compared against `mean ± 4σ` boundaries.
+Fits a minimum area rectangle around the clip contour. The longer side = clip width. Compared against `mean ± 4σ` boundaries. If clip is not fully snapped, camera sees small protrusion of the clip.
 - `W > upper` → Clip Not Fully Snapped
 - `W < lower` → Clip Broken
 
@@ -99,7 +99,7 @@ Capture ~50 images of good parts.
 ```bash
 python get_stats.py
 ```
-Outputs mean/std for width, deviation, and brightness used as decision boundaries.
+Outputs mean and std for width, deviation, and brightness used as decision boundaries.
 
 ### 5. Run live inspection
 ```bash
@@ -112,7 +112,7 @@ python live_detect.py
 
 ### Measurement System Analysis (SNR)
 - Method: Average Range Method (20 parts, 2 trials each)
-- **SNR = 14.9** — exceeds AIAG MSA minimum threshold of 5
+- **SNR = 14.9** (exceeds AIAG MSA minimum threshold of 5)
 
 ### Confusion Matrix (20 good + 20 defect parts)
 |  | Actual Good | Actual Defect |
