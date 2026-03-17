@@ -32,20 +32,7 @@ The camera is enclosed in a box to eliminate environmental lighting noise.
 
 ## System Flow
 
-```
-Capture Frame → Lighting Check → Live Preview → Wait for Arduino Trigger
-                                                        ↓
-                                               Color Clip Check
-                                               (No clip → Defect)
-                                                        ↓
-                                                  Width Check
-                                          (Too wide/narrow → Defect)
-                                                        ↓
-                                             Deviation Check
-                                          (Off-center → Defect)
-                                                        ↓
-                                                  Good Part
-```
+![alt text](images/flow_chart.png)
 
 ---
 
@@ -53,17 +40,24 @@ Capture Frame → Lighting Check → Live Preview → Wait for Arduino Trigger
 
 ### Lighting Check
 Crops the top patch of the frame, reads the HSV V-channel mean brightness, and compares it against a baseline ± 10% tolerance recorded during data collection.
+![alt text](images/zones.png)
 
 ### Color Clip Check
-Converts the frame to HSV, applies a color threshold for the orange-red clip, finds contours in the binary mask. No contour → **No Clip**.
+Converts the frame to HSV, applies a color threshold for the orangenclip, finds contours in the binary mask. No contour → **No Clip**.
+![alt text](images/pipeline.png)
 
 ### Width Check
 Fits a minimum area rectangle around the clip contour. The longer side = clip width. Compared against `mean ± 4σ` boundaries.
 - `W > upper` → Clip Not Fully Snapped
 - `W < lower` → Clip Broken
+![alt text](images/width_fail.png)
 
 ### Deviation Check
-Detects the injector body center using an HSV dark-color mask and fits a min-area rectangle to find its axis. Measures the pixel distance from the clip center to the injector axis. Compared against `mean ± 4σ` boundaries.
+Detects the injector body center using an HSV dark-color mask and fits a min-area rectangle to find its axis. Measures the pixel distance from the clip center to the injector axis. Compared against `mean ± 6σ` boundaries.
+![alt text](images/dev_fail.png)
+
+### Pass all checks (Good)
+![alt text](images/pass_all.png)
 
 ---
 
@@ -72,11 +66,11 @@ Detects the injector body center using an HSV dark-color mask and fits a min-are
 | File | Description |
 |---|---|
 | `live_detect.py` | Main live inspection loop |
-| `data_collect.py` | Data collection — captures good-part images via Arduino trigger |
+| `data_collect.py` | Captures good-part images via Arduino trigger |
 | `get_stats.py` | Computes mean/std statistics from collected images |
-| `SNR.py` | Measurement System Analysis — Signal-to-Noise Ratio |
-| `visual_steps.py` | Debug tool — saves each processing step as an image |
-| `trigger_capture.ino` | Arduino sketch — reads IR sensor, sends trigger to PC |
+| `SNR.py` | Measurement System Analysis (Signal-to-Noise Ratio) |
+| `visual_steps.py` | Debug tool that saves each processing step as an image |
+| `trigger_capture.ino` |reads IR sensor, sends trigger|
 
 ---
 
@@ -113,7 +107,7 @@ python live_detect.py
 
 ### Measurement System Analysis (SNR)
 - Method: Average Range Method (20 parts, 2 trials each)
-- **SNR = 8.51** — exceeds AIAG MSA minimum threshold of 5
+- **SNR = 14.9** — exceeds AIAG MSA minimum threshold of 5
 
 ### Confusion Matrix (20 good + 20 defect parts)
 |  | Actual Good | Actual Defect |
@@ -135,12 +129,3 @@ python live_detect.py
 | Automated (Defect) | 0.00299 s |
 
 ---
-
-## Limitations
-- Tested with 3D-printed mockups, not real production parts
-- Conveyor belt speed limited by small motor
-
-## Future Work
-- Migrate to Raspberry Pi for a self-contained unit
-- Validate with real factory parts
-- Optimize full process time beyond decision time
