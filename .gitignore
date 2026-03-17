@@ -1,0 +1,13 @@
+# Virtual environment
+venv/
+
+# Data folders
+captured_images/
+results/
+snr_data/
+step_outputs/
+train_results/
+
+# Python
+__pycache__/
+*.pyc
