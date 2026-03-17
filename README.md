@@ -40,23 +40,28 @@ The camera is enclosed in a box to eliminate environmental lighting noise.
 
 ### Lighting Check
 Crops the top patch of the frame, reads the HSV V-channel mean brightness, and compares it against a baseline ± 10% tolerance recorded during data collection.
+
 ![alt text](images/zones.png)
 
 ### Color Clip Check
 Converts the frame to HSV, applies a color threshold for the orangenclip, finds contours in the binary mask. No contour → **No Clip**.
+
 ![alt text](images/pipeline.png)
 
 ### Width Check
 Fits a minimum area rectangle around the clip contour. The longer side = clip width. Compared against `mean ± 4σ` boundaries.
 - `W > upper` → Clip Not Fully Snapped
 - `W < lower` → Clip Broken
+
 ![alt text](images/width_fail.png)
 
 ### Deviation Check
 Detects the injector body center using an HSV dark-color mask and fits a min-area rectangle to find its axis. Measures the pixel distance from the clip center to the injector axis. Compared against `mean ± 6σ` boundaries.
+
 ![alt text](images/dev_fail.png)
 
 ### Pass all checks (Good)
+
 ![alt text](images/pass_all.png)
 
 ---
